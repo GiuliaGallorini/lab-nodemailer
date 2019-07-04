@@ -70,19 +70,38 @@ console.log("TCL", username, email, password, confirmationCode);
       from: '"Your confirmation code" <yourcode@ironhack.com>',
       to: email, 
       subject: "Your confirmation code",
-      text: `Your confirmation code is ${confirmationCode}. <br> Go to the following link to insert your code <br> http://localhost:3000/auth/confirm/THE-CONFIRMATION-CODE-OF-THE-USER`,
-      html: '<b>' + `Your confirmation code is ${confirmationCode}.` + `<br>` + `Go to the following link to insert your code ` + `<br>` + `http://localhost:3000/auth/confirm/THE-CONFIRMATION-CODE-OF-THE-USER` + '</b>'
+      text: `Your confirmation code is ${confirmationCode}. <br> Go to the following link to insert your code <br> http://localhost:3000/auth/confirm/${confirmationCode}`,
+      html: '<b>' + `Your confirmation code is ${confirmationCode}.` + `<br>` + `Go to the following link to insert your code ` + `<br>` + `http://localhost:3000/auth/confirm/${confirmationCode}` + '</b>'
     })
 
     newUser.save()
     .then(() => {
-      res.redirect("/");
+      res.redirect("/message");
     })
     .catch(err => {
       res.render("auth/signup", { message: "Something went wrong" });
     })
   });
 });
+
+router.get("/confirm/:confirmCode", (req, res, next) => {
+  let confirmUrl = req.params.confirmCode;
+  console.log("TLC", confirmUrl);
+
+  User.findOne({ confirmationCode: confirmUrl })
+    .then(user => {
+      console.log(user);
+      res.render("auth/login");
+      console.log("TCL", user.confirmationCode);
+      user.status = "Active";
+      console.log(user);
+    })
+    
+
+  // let confirmationCodeUser = req.user.confirmationCode;
+});
+
+
 
 router.get("/logout", (req, res) => {
   req.logout();
